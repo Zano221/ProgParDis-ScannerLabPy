@@ -1,7 +1,5 @@
-import socket
-import mysql.connector
+import socket, io, os
 from PIL import Image, ImageChops
-import io
 
 #configuração de servidor
 server_ip = '127.0.0.1'
@@ -11,7 +9,23 @@ server_port = 1337
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 ## Carregar as imagens de cientistas presentes
-image_reference = Image.open('C:\Add1.jpg')
+#image_reference = Image.open('C:\Add1.jpg')
+
+
+## Carregar as imagens dos cientistas
+
+image_db = []
+path = os.path.abspath('.\images')
+if path is None:
+    print("ERRO! Deve existir um diretorio das imagens 'images'! ")
+image_paths = os.listdir(path)
+
+
+for p in image_paths:
+    print(p)
+    image_db.append(Image.open('.\images\\' + p))
+
+print(image_db[1])
 
 same_images = True
 
