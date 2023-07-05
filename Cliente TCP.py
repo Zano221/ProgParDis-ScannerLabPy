@@ -1,5 +1,5 @@
 import socket
-
+import tkinter as tk
 
 #configuração de servidor
 server_ip = '127.0.0.1'
@@ -15,11 +15,14 @@ try:
     message = input("Digite a sua mensagem: ")
     #client_socket.sendall(message.encode())
 
-    image = open('imagem_recebida.jpg', 'rb')
+    image = open('.\images\\Add1.jpg', 'rb')
     raw_image = image.read()
     image.close()
 
     client_socket.sendall(raw_image)
+
+    #enviar a menssagem do setor
+    client_socket.sendall(message.encode())
 
     print("Esperando por resposta...")
     modified_message = client_socket.recv(1024).decode()

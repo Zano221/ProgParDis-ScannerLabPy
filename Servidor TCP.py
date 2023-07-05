@@ -8,10 +8,6 @@ server_port = 1337
 # Criação de socket TCP/IP
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-## Carregar as imagens de cientistas presentes
-#image_reference = Image.open('C:\Add1.jpg')
-
-
 ## Carregar as imagens dos cientistas
 
 image_db = []
@@ -20,14 +16,15 @@ if path is None:
     print("ERRO! Deve existir um diretorio das imagens 'images'! ")
 image_paths = os.listdir(path)
 
-
+#Vo adicionar uma função que escolhe aleatoriamente entre A e E mas vou deixar pra dps
+array_of_letters = ['A', 'B', 'C', 'D', 'E']
+_key = 0
 for p in image_paths:
-    print(p)
-    image_db.append(Image.open('.\images\\' + p))
-
-print(image_db[1])
-
-same_images = True
+    if _key > 4:
+        _key = 0
+    image_db.append((Image.open('.\images\\' + p), array_of_letters[_key]))
+    print(".\images\\" + p, array_of_letters[_key])
+    _key += 1
 
 try:
     #Vincular o endereço IP e porta ao socket
@@ -43,26 +40,32 @@ try:
         #Recebendo mensagem do cliente
         print("Escutando...")
         message = client_socket.recv(300000)
-
         print("Imagem Recebida")
 
-        #Determinar se a imagem existe
-        print("Comparando as duas imagens")
+        print("Recebendo setor...")
+        sector_message = client_socket.recv(1024).decode()
+
+        #Autenticar Cientista
+        print("Comparando a imagem recebida com as do banco de dados")
+
         received_image = Image.open(io.BytesIO(message))
 
-        if received_image.size != image_reference.size:
-            same_images = False
-        else:
-            difference = ImageChops.difference(received_image, image_reference)
-            if difference.getbbox():
-                same_images = False
-
-        #Se ela existe, checa a permissão dele no setor
-        if same_images:
-            result = "IGUAIS"
-        else:
-            result = "DIFERENTES"
-        
+        #Loopar pelo banco de dados das imagens do servidor
+        for i in image_db:
+            difference = ImageChops.difference(received_image, i[0])
+            #Determinar se a imagem existe
+            if not difference.getbbox():      
+                print("É A IMAGEM DO", i[1])
+                #Determinar se o Cientista está acessando o setor correto
+                if i[1] != sector_message.upper():
+                    result = "CIENTISTA NÃO TEM PERMISSÃO PARA ACESSAR O SETOR " + i[1]
+                    break
+                result = "SEJA BEM VINDO AO SETOR " + i[1]
+                break
+            else:
+                result = "CIENTISTA NÃO EXISTE!"
+                
+        #Enviar resultado final de permissão ao cientista
         client_socket.sendall(result.encode())
         #Transformação da string em letras maíusculas
 
