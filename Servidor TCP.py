@@ -11,7 +11,7 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ## Carregar as imagens dos cientistas
 
 image_db = []
-path = os.path.abspath('.\images')
+path = os.path.abspath('.\images_srv')
 if path is None:
     print("ERRO! Deve existir um diretorio das imagens 'images'! ")
 image_paths = os.listdir(path)
@@ -22,7 +22,7 @@ _key = 0
 for p in image_paths:
     if _key > 4:
         _key = 0
-    image_db.append((Image.open('.\images\\' + p), array_of_letters[_key]))
+    image_db.append((Image.open('.\images_srv\\' + p), array_of_letters[_key]))
     print(".\images\\" + p, array_of_letters[_key])
     _key += 1
 
